@@ -50,6 +50,8 @@ class Node {
 
                 if (this.holding === true) {
                     this.next.receive(this, new Message(this, MESSAGE.PRIVILEGE));
+                    this.holding = false;
+                    this.next = 0;
                 }
             }
         } else {
@@ -77,9 +79,5 @@ node6.last = node5;
 node3.EnterCS();
 
 setTimeout(() => {
-    node1.EnterCS();
-
-    setTimeout(() => {
-        node6.EnterCS();
-    }, 1000);
+    node6.EnterCS();
 }, 1000);
