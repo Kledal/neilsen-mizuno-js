@@ -39,25 +39,28 @@ class Node {
 
     // message: Message
     receive(from, message) {
-        console.log('[' + this.id + ' RECEIVE]: from ' + from.id + ' type: ' + message.type)
-        if (message.type === MESSAGE.REQUEST) {
-            if (this.last !== 0) {
-                this.last.receive(this, message);
-                this.last = from;
-            } else {
-                this.next = message.initator;
-                this.last = from;
+        // setTimeout simulate channel delay
+        setTimeout(() => {
+            console.log('[' + this.id + ' RECEIVE]: from ' + from.id + ' type: ' + message.type + ' initator: ' + message.initator.id)
+            if (message.type === MESSAGE.REQUEST) {
+                if (this.last !== 0) {
+                    this.last.receive(this, message);
+                    this.last = from;
+                } else {
+                    this.next = message.initator;
+                    this.last = from;
 
-                if (this.holding === true) {
-                    this.next.receive(this, new Message(this, MESSAGE.PRIVILEGE));
-                    this.holding = false;
-                    this.next = 0;
+                    if (this.holding === true) {
+                        this.next.receive(this, new Message(this, MESSAGE.PRIVILEGE));
+                        this.holding = false;
+                        this.next = 0;
+                    }
                 }
+            } else {
+                this.holding = true;
+                this.EnterCS();
             }
-        } else {
-            this.holding = true;
-            this.EnterCS();
-        }
+        }, 10);
     }
 }
 
@@ -76,8 +79,12 @@ node4.last = node5;
 var node6 = new Node(6);
 node6.last = node5;
 
-node3.EnterCS();
+//node3.EnterCS();
 
 setTimeout(() => {
     node6.EnterCS();
+}, 1000);
+
+setTimeout(() => {
+    node3.EnterCS();
 }, 1000);
